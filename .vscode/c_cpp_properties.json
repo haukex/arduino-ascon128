@@ -1,0 +1,29 @@
+{
+    "configurations": [
+        {
+            "name": "Arduino (Linux)",
+            "includePath": [
+                "${workspaceFolder}/src",
+                // arduino-cli config get --json directories.data
+                "${userHome}/.arduino15/packages/arduino/**"
+            ],
+            "defines": [
+                "ARDUINO=10800",      // Arduino core version 1.8.0 or higher
+                "__AVR_ATmega328P__"  // Default to Arduino Uno
+            ],
+            "compilerPath": "${userHome}/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
+            "cStandard": "gnu99", "cppStandard": "gnu++11"
+        },
+        {
+            "name": "Arduino (Windows)",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${userHome}/AppData/Local/Arduino15/packages/arduino/**"
+            ],
+            "defines": [ "ARDUINO=10800", "__AVR_ATmega328P__" ],
+            "compilerPath": "${userHome}/AppData/Local/Arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/bin/avr-gcc",
+            "cStandard": "gnu99", "cppStandard": "gnu++11"
+        }
+    ],
+    "version": 4
+}

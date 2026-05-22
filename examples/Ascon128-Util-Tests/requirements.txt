@@ -1,0 +1,4 @@
+# Required Python packages to run the tests in this directory
+# $ python -m pip install --upgrade --upgrade-strategy=eager -r requirements.txt
+pyserial == 3.5
+ascon == 0.0.9

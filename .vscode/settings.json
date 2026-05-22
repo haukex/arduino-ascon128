@@ -1,0 +1,16 @@
+{
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "editor.rulers": [ 100 ],
+    "[python]": {
+        "editor.rulers": [ 79 ],
+    },
+    "python.analysis.typeCheckingMode": "standard",
+    "indentRainbow.ignoreErrorLanguages": [
+        "python",
+        "markdown",
+    ],
+    "cSpell.words": [
+        "Ascon",
+    ]
+}
