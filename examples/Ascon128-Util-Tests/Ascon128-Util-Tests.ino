@@ -30,7 +30,8 @@
  * - In the Arduino IDE, Sketch -> Export Compiled Binary
  *   (ELF file gets written to "build" folder in sketch directory)
  * - Locate the avr-* tools:
- * - `cd "$( arduino-cli config get directories.data )"/packages/arduino/tools/avr-gcc/* && cd bin`
+ * - `cd "$( arduino-cli config get directories.data )"/packages/arduino/tools/avr-gcc && cd * && cd bin`
+ *   (that last bit of the command is written like that to avoid star-slash inside a C comment...)
  * - `avr-size -C <FILE>.elf` - just shows the numbers that the GUI shows too
  * - `avr-nm -S -C -l --format=sysv --size-sort -td <FILE>.elf | grep -E '\.(data|bss|noinit)'`
  * - `avr-objdump -Cwt -j.bss -j.data -j.noinit <FILE>.elf`
@@ -80,11 +81,13 @@ void _write_buf2(const uint8_t iv[16], const size_t len) {
   memcpy(out_buf, iv, 16);  // first the IV
   hex_encode(out_buf, 16);
   Serial.write(out_buf, 32);
+  Serial.flush();  // apparently needed on `arduino:renesas_uno:unor4wifi`!
   for(size_t pos=0; pos<len; pos+=16) {
     const uint8_t left = pos+16<len ? 16 : len-pos;
     memcpy(out_buf, &buf2[pos], left);
     hex_encode(out_buf, left);
     Serial.write(out_buf, left*2);
+    Serial.flush();
   }
   Serial.println();
 }

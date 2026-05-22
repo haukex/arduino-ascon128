@@ -16,10 +16,16 @@ Entry points:
   nonce/IV (monotonically increasing counter).
 - Of course you are welcome to use only the Z85, hex, or Ascon128 functions individually.
 
-The code in this repository was tested on the following, using the sketches (and associated Python
-script) in the `examples` folder.
-- Arduino Uno (ATmega328P)
-- D1 mini (ESP8266)
+The code in this repository was tested via `run_tests.py` on the following:
+- Arduino UNO R3 (ATmega328P, `arduino:avr:uno`)
+- D1 mini (ESP8266, `esp8266:esp8266:d1_mini` / `esp8266:esp8266:d1_mini_clone`)
+  - Manually press the reset button immediately after the message "Waiting for boot..."
+- Arduino UNO R4 WiFi (`arduino:renesas_uno:unor4wifi`)
+  - Manually press the reset button on the message "Done in X seconds" and release on
+    "Waiting for boot..."
+
+Note for the latter two you may have to manually hit the reset button on the board immediately
+after seeing the output "Waiting for boot..."
 
 References:
 - https://ascon.isec.tugraz.at/

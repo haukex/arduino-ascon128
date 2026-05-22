@@ -162,6 +162,7 @@ def main():
         do_encrypt_test(ser)
         do_encrypt_z85_test(ser)
         do_decrypt_test(ser)
+    print("PASS")
 
 
 if __name__ == '__main__':
