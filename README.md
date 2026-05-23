@@ -14,7 +14,8 @@ Entry points:
   in-place (or printed directly to an output stream).
 - [`uint128.hpp`](./src/uint128.hpp) provides a simple 128-bit integer that can be used as a
   nonce/IV (monotonically increasing counter).
-- Of course you are welcome to use only the Z85, hex, or Ascon128 functions individually.
+- And of course you are welcome to use only the [Z85](./src/z85.hpp) or
+  [Ascon128](./src/Ascon128.h) functions individually.
 
 The code in this repository was tested via `run_tests.py` on the following:
 - Arduino UNO R3 (ATmega328P, `arduino:avr:uno`)
@@ -23,9 +24,6 @@ The code in this repository was tested via `run_tests.py` on the following:
 - Arduino UNO R4 WiFi (`arduino:renesas_uno:unor4wifi`)
   - Manually press the reset button on the message "Done in X seconds" and release on
     "Waiting for boot..."
-
-Note for the latter two you may have to manually hit the reset button on the board immediately
-after seeing the output "Waiting for boot..."
 
 References:
 - https://ascon.isec.tugraz.at/
