@@ -17,6 +17,13 @@ Entry points:
 - And of course you are welcome to use only the [Z85](./src/z85.hpp) or
   [Ascon128](./src/Ascon128.h) functions individually.
 
+Some implementations are non-reentrant because they use `static` variables to make their RAM usage
+more clearly visible in the Arduino compile output - the assumption behind this design choice is
+that these functions will always be used during the runtime of the program. Also note that
+`as128.hpp` and `as128z85.hpp` aren't really designed to be used together because they each
+instantiate a `static Ascon128 cipher` and therefore each use roughly 60 bytes of RAM - the former
+is intended for systems with transmit/receive capability and the latter for transmit-only systems.
+
 The code in this repository was tested via `run_tests.py` on the following:
 - Arduino UNO R3 (ATmega328P, `arduino:avr:uno`)
 - D1 mini (ESP8266, `esp8266:esp8266:d1_mini` / `esp8266:esp8266:d1_mini_clone`)

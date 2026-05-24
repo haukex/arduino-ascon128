@@ -25,7 +25,8 @@
 /** Decode the buffer as a string of hex characters *in place!*
  * The length must be divisible by two.
  * The length of the resulting buffer will be the length divided by two.
- * If decoding the string fails, returns false. */
+ * If decoding the string fails, returns false, and the buffer may only be
+ * partially decoded. */
 bool hex_decode(uint8_t* buffer, size_t len);
 
 /** Encode the buffer as a string of hex characters *in place!*

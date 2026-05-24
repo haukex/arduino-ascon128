@@ -33,5 +33,7 @@ void as128_encrypt(const uint8_t secret[16], const uint8_t iv[16], const uint8_t
  * was generated with the following structure: the "associated data" is exactly the IV and is the
  * first 16 bytes of the buffer, and the tag is the last 16 bytes of the buffer. The ``output``
  * buffer **MUST** hold at least ``len-32`` bytes, and this is also the size of the resulting
- * output buffer. If decryption fails, returns false. */
+ * output buffer. If decryption fails, returns false.
+ * **WARNING:** The ``output`` buffer may contain partially decrypted but invalid output on failure.
+ * If this function returns false, the caller must discard the output buffer. */
 bool as128_decrypt(const uint8_t secret[16], const uint8_t* buffer, size_t len, uint8_t* output);
