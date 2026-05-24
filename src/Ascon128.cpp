@@ -79,9 +79,6 @@ size_t Ascon128::keySize() const
  * \brief Gets the size of the Ascon128 initialization vector in bytes.
  *
  * \return Always returns 16, indicating a 128-bit IV.
- *
- * Authentication tags may be truncated to 8 bytes, but the algorithm authors
- * recommend using a full 16-byte tag.
  */
 size_t Ascon128::ivSize() const
 {
@@ -92,6 +89,9 @@ size_t Ascon128::ivSize() const
  * \brief Gets the size of the Ascon128 authentication tag in bytes.
  *
  * \return Always returns 16, indicating a 128-bit authentication tag.
+ *
+ * Authentication tags may be truncated to 8 bytes, but the algorithm authors
+ * recommend using a full 16-byte tag.
  */
 size_t Ascon128::tagSize() const
 {
@@ -251,7 +251,8 @@ void Ascon128::computeTag(void *tag, size_t len)
 bool Ascon128::checkTag(const void *tag, size_t len)
 {
     // The tag can never match if it is larger than the maximum allowed size.
-    if (len > 16)
+    // Also reject tag lengths shorter than the truncated size.
+    if (len > 16 || len < 8)
         return false;
 
     // End authentication mode if there was no plaintext/ciphertext.
@@ -268,8 +269,6 @@ bool Ascon128::checkTag(const void *tag, size_t len)
     uint64_t T[2];
     T[0] = htobe64(state.S[3] ^ state.K[0]);
     T[1] = htobe64(state.S[4] ^ state.K[1]);
-    if (len > 16)
-        len = 16;
     bool ok = secure_compare(T, tag, len);
     clean(T);
     return ok;
