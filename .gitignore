@@ -2,3 +2,4 @@
 .mypy_cache/
 /build/
 /Ascon128.zip
+__pycache__/

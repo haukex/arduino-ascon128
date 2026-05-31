@@ -72,7 +72,11 @@ const uint8_t* SECRET = (uint8_t*)"Super Secret! :)";
 Ascon128 cipher;
 
 // Note: In theory, could maybe use `const uint32_t m = millis()` for IV in some cases? Wraps after ~49.7 days!
-/** Returns a new IV. */
+/** Returns a new IV.
+ *
+ * Since this is only for testing, IV reuse is not a problem. In a real-world implementation, you
+ * should store the IV in non-volatile memory.
+ */
 const uint8_t* next_iv() {
   static uint128_t iv = {0, 0};
   static uint8_t ivb[16];

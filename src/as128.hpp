@@ -28,7 +28,8 @@
  * structure as follows.
  *
  * The buffer must be at least 16 bytes in size, in addition the plaintext to be encrypted.
- * ``len`` must be the size of the buffer in bytes and **MUST** be at least 16.
+ * ``len`` must be the size of the buffer in bytes and **MUST** be at least 16 -
+ * if ``len<16``, the function simply aborts without doing anything!
  *
  * The ``iv`` buffer must contain the IV. The IV is used as the "associated data", that is,
  * unencrypted but checksummed data. The caller is responsible for ensuring that IVs are not
@@ -40,7 +41,8 @@
  *
  * The first ``len-16`` bytes before the tag are the plaintext that will be encrypted in-place.
  */
-void as128_encrypt(Ascon128 &cipher, const uint8_t secret[16], const uint8_t iv[16], void *buffer, size_t len);
+void as128_encrypt(Ascon128 &cipher, const uint8_t secret[16], const uint8_t iv[16],
+  void *buffer, size_t len);
 
 /** This function decrypts the given buffer using the Ascon-128 algorithm in-place using the buffer
  * structure as follows.

@@ -1,7 +1,7 @@
 Ascon-128 and Utility Functions for Arduino
 ===========================================
 
-This library implements Ascon-128 (taken from [Rhys Weatherley's](https://github.com/rweather) great
+This library implements Ascon-128¹ (taken from [Rhys Weatherley's](https://github.com/rweather) great
 Crypto and CryptoLW libraries), hexadecimal en-/decoding, and Z85 encoding utility functions.
 
 Entry points:
@@ -24,6 +24,13 @@ The code in this repository was tested via `run_tests.py` on the following:
   - Manually press the reset button immediately after the message "Waiting for boot..."
 - Arduino UNO R4 WiFi (`arduino:renesas_uno:unor4wifi`)
   - Manually press the reset button immediately after the message "Waiting for boot..."
+
+¹ Specifically, implements Ascon v1.2 Ascon-128 as submitted to
+[NIST LWC](https://csrc.nist.gov/projects/lightweight-cryptography/finalists) and
+[CAESAR](https://competitions.cr.yp.to/caesar-submissions.html), not the final
+[NIST SP 800-232](https://doi.org/10.6028/NIST.SP.800-232) "Ascon-AEAD128" variant.
+This implementation is tested against the `variant="Ascon-128"` from the
+Python package [`ascon 0.0.9`](https://pypi.org/project/ascon/0.0.9/).
 
 References:
 - https://ascon.isec.tugraz.at/

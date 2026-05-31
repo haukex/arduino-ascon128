@@ -21,7 +21,9 @@
  */
 #include "as128.hpp"
 
-void as128_encrypt(Ascon128 &cipher, const uint8_t secret[16], const uint8_t iv[16], void * const buf, const size_t len) {
+void as128_encrypt(Ascon128 &cipher, const uint8_t secret[16], const uint8_t iv[16],
+    void * const buf, const size_t len) {
+  if (len<16) return;
   uint8_t * const buffer = (uint8_t*)buf;
   // note .setKey also resets internal state
   cipher.setKey(secret, 16);  // key size is always 16
