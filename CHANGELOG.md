@@ -19,6 +19,8 @@ Ascon128 Changelog
 
 - Fixed <https://github.com/rweather/arduinolibs/issues/80> in the local copy, so that now
   `Ascon128::decrypt` can perform in-place decryption as documented.
+- `z85_print` was the only remaining function using a `static` variable, but since it was only
+  4 bytes, I've now switched to a regular stack variable to make the function reentrant.
 
 1.0.0 - 2026-05-22
 ------------------

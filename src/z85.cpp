@@ -25,7 +25,7 @@ static constexpr uint8_t _z85_tbl[] PROGMEM = "0123456789abcdefghijklmnopqrstuvw
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
 
 void z85_print(Print &out, const uint8_t* buffer, size_t len) {
-  static uint32_t n;  // static so it's seen in the Arduino compile output more obviously
+  uint32_t n;
   while (len) {
     n=0;  // If less than 4 bytes left, treat the rest of the bytes as 0!
     memcpy(&n, buffer, len>4 ? 4 : len);
