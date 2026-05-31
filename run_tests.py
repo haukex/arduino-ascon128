@@ -60,18 +60,18 @@ def main():
     # restore previous enable_unsafe_install setting
     run(['arduino-cli', 'config', 'set', 'library.enable_unsafe_install',
          prev_unsafe], check=True)
-
+    # compile and upload my test sketch
     run(['arduino-cli', 'compile', '--fqbn', args.FQBN, '--warnings', 'all',
          '--upload', '--port', args.port, '--verify',
          MY_PATH/'examples'/'Ascon128-Util-Tests'], check=True)
-
+    # run my test script against the test sketch
     run(['python', MY_PATH/'examples'/'Ascon128-Util-Tests'/'test.py',
          args.port], check=True)
-
+    # compile and upload the Ascon128 test sketch
     run(['arduino-cli', 'compile', '--fqbn', args.FQBN, '--warnings', 'all',
          '--upload', '--port', args.port, '--verify',
          MY_PATH/'examples'/'TestAscon'], check=True)
-
+    # check the output of the Ascon128 test sketch
     with serial.Serial(port=args.port, baudrate=115200, timeout=10) as ser:
         print("Waiting for boot...")
         start_time = monotonic()
