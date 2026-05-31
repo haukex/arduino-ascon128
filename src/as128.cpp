@@ -21,26 +21,24 @@
  */
 #include "as128.hpp"
 
-#include <Ascon128.h>
-
-static Ascon128 cipher;  // uses approx. 60 bytes (see private fields in Ascon128.h)
-
-void as128_encrypt(const uint8_t secret[16], const uint8_t iv[16], const uint8_t* buffer, const size_t len, uint8_t* output) {
+void as128_encrypt(Ascon128 &cipher, const uint8_t secret[16], const uint8_t iv[16], void * const buf, const size_t len) {
+  uint8_t * const buffer = (uint8_t*)buf;
   // note .setKey also resets internal state
   cipher.setKey(secret, 16);  // key size is always 16
   cipher.setIV(iv, 16);       // IV size is always 16
   cipher.addAuthData(iv, 16);
-  cipher.encrypt(output, buffer, len);
-  cipher.computeTag(output+len, 16);  // tag size is always 16
+  cipher.encrypt(buffer, buffer, len-16);
+  cipher.computeTag(buffer+len-16, 16);  // tag size is always 16
   cipher.clear();
 }
 
-bool as128_decrypt(const uint8_t secret[16], const uint8_t* buffer, const size_t len, uint8_t* output) {
+bool as128_decrypt(Ascon128 &cipher, const uint8_t secret[16], void * const buf, const size_t len) {
   if (len<32) return false;
+  uint8_t * const buffer = (uint8_t*)buf;
   cipher.setKey(secret, 16);
   cipher.setIV(buffer, 16);
   cipher.addAuthData(buffer, 16);  // buffer starts with IV as additional data
-  cipher.decrypt(output, buffer+16, len-32);
+  cipher.decrypt(buffer+16, buffer+16, len-32);
   const bool rv = cipher.checkTag(buffer+len-16, 16);  // buffer ends with tag
   cipher.clear();
   return rv;

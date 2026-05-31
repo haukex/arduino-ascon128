@@ -44,8 +44,19 @@ constexpr size_t MAIN_BUF_SZ = 320;
 
 /* ********** ********** Hex & Z85 Test ********** ********** */
 
-void hex_test(const uint8_t* buffer, const size_t len) {
-  hex_print(Serial, buffer, len);
+void hex_test(const uint8_t* buffer, size_t len) {
+  static uint8_t out_buf[32];
+  while(len) {
+    const size_t left = len > 16 ? 16 : len;
+    memcpy(out_buf, buffer, left);
+    hex_encode(out_buf, left);
+    Serial.write(out_buf, left*2);
+    #if defined(ARDUINO_ARCH_RENESAS)
+      Serial.flush();  // apparently needed on Arduino UNO R4 (bug?)
+    #endif
+    buffer += left;
+    len -= left;
+  }
   Serial.println();
 }
 
@@ -58,6 +69,8 @@ void z85_test(const uint8_t* buffer, const size_t len) {
 
 const uint8_t* SECRET = (uint8_t*)"Super Secret! :)";
 
+Ascon128 cipher;
+
 // Note: In theory, could maybe use `const uint32_t m = millis()` for IV in some cases? Wraps after ~49.7 days!
 /** Returns a new IV. */
 const uint8_t* next_iv() {
@@ -69,49 +82,29 @@ const uint8_t* next_iv() {
 }
 
 void as128_enc_z85_test(const uint8_t* buffer, const size_t len) {
-  as128_encrypt_print_z85(Serial, SECRET, next_iv(), buffer, len);
+  as128_encrypt_print_z85(cipher, Serial, SECRET, next_iv(), buffer, len);
   Serial.println();
 }
 
-constexpr size_t BUF2_SZ = MAIN_BUF_SZ/2-16;
-static uint8_t buf2[BUF2_SZ];
-
-void _write_buf2(const uint8_t iv[16], const size_t len) {
-  static uint8_t out_buf[32];
-  memcpy(out_buf, iv, 16);  // first the IV
-  hex_encode(out_buf, 16);
-  Serial.write(out_buf, 32);
-  Serial.flush();  // apparently needed on `arduino:renesas_uno:unor4wifi`!
-  for(size_t pos=0; pos<len; pos+=16) {
-    const uint8_t left = pos+16<len ? 16 : len-pos;
-    memcpy(out_buf, &buf2[pos], left);
-    hex_encode(out_buf, left);
-    Serial.write(out_buf, left*2);
-    Serial.flush();
-  }
-  Serial.println();
-}
-
-void as128_enc_test(const uint8_t* buffer, const size_t len) {
-  if (len+16 > BUF2_SZ) {
+void as128_enc_test(uint8_t* buffer, const size_t len) {
+  if (len+16 > MAIN_BUF_SZ) {
     Serial.println(F("Not enough memory?"));
     return;
   }
   const uint8_t* iv_buf = next_iv();
-  as128_encrypt(SECRET, iv_buf, buffer, len, buf2);
-  _write_buf2(iv_buf, len+16);
+  hex_print(Serial, iv_buf, 16);
+  as128_encrypt(cipher, SECRET, iv_buf, buffer, len+16);
+  hex_print(Serial, buffer, len+16);
+  Serial.println();
 }
 
-void as128_dec_test(const uint8_t* buffer, const size_t len) {
-  if (len-32 > BUF2_SZ) {
-    Serial.println(F("Not enough memory?"));
-    return;
-  }
-  if (!as128_decrypt(SECRET, buffer, len, buf2)) {
+void as128_dec_test(uint8_t* buffer, const size_t len) {
+  if (!as128_decrypt(cipher, SECRET, buffer, len)) {
     Serial.println(F("Decrypt failed"));
     return;
   }
-  _write_buf2(buffer, len-32);
+  hex_print(Serial, buffer, len-16);
+  Serial.println();
 }
 
 /* ********** ********** ********** ********** Main ********** ********** ********** ********** */
@@ -156,3 +149,5 @@ void loop() {
   }
 
 }
+
+// spell: ignore Renesas

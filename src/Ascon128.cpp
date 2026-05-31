@@ -1,6 +1,9 @@
 /** This file was derived from:
  * https://github.com/rweather/arduinolibs/blob/37a76b8f7516568e1c575b6dc9268da1ccaac6b6/libraries/CryptoLW/src/Ascon128.cpp
  *
+ * Minor modifications by Hauke D (2026):
+ * - A fix for https://github.com/rweather/arduinolibs/issues/80 was applied.
+ *
  * Copyright (C) 2018 Southern Storm Software, Pty Ltd.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -144,12 +147,10 @@ void Ascon128::encrypt(uint8_t *output, const uint8_t *input, size_t len)
 {
     if (authMode)
         endAuth();
-    const uint8_t *in = (const uint8_t *)input;
-    uint8_t *out = (uint8_t *)output;
     while (len > 0) {
         // Encrypt the next byte using the first 64-bit word in the state.
-        ((uint8_t *)(state.S))[posn] ^= *in++;
-        *out++ = ((const uint8_t *)(state.S))[posn];
+        ((uint8_t *)(state.S))[posn] ^= *input++;
+        *output++ = ((const uint8_t *)(state.S))[posn];
         --len;
 
         // Permute the state for b = 6 rounds at the end of each block.
@@ -173,12 +174,11 @@ void Ascon128::decrypt(uint8_t *output, const uint8_t *input, size_t len)
 {
     if (authMode)
         endAuth();
-    const uint8_t *in = (const uint8_t *)input;
-    uint8_t *out = (uint8_t *)output;
     while (len > 0) {
         // Decrypt the next byte using the first 64-bit word in the state.
-        *out++ = ((const uint8_t *)(state.S))[posn] ^ *in;
-        ((uint8_t *)(state.S))[posn] = *in++;
+        const uint8_t c = *input++;
+        *output++ = ((const uint8_t *)(state.S))[posn] ^ c;
+        ((uint8_t *)(state.S))[posn] = c;
         --len;
 
         // Permute the state for b = 6 rounds at the end of each block.

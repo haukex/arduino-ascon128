@@ -1,7 +1,8 @@
 Ascon-128 and Utility Functions for Arduino
 ===========================================
 
-This library implements Ascon-128, hexadecimal en-/decoding, and Z85 encoding utility functions.
+This library implements Ascon-128 (taken from [Rhys Weatherley's](https://github.com/rweather) great
+Crypto and CryptoLW libraries), hexadecimal en-/decoding, and Z85 encoding utility functions.
 
 Entry points:
 - For memory-constrained systems, [`as128z85.hpp`](./src/as128z85.hpp) provides
@@ -19,18 +20,14 @@ Entry points:
 
 Some implementations are non-reentrant because they use `static` variables to make their RAM usage
 more clearly visible in the Arduino compile output - the assumption behind this design choice is
-that these functions will always be used during the runtime of the program. Also note that
-`as128.hpp` and `as128z85.hpp` aren't really designed to be used together because they each
-instantiate a `static Ascon128 cipher` and therefore each use roughly 60 bytes of RAM - the former
-is intended for systems with transmit/receive capability and the latter for transmit-only systems.
+that these functions will always be used during the runtime of the program.
 
 The code in this repository was tested via `run_tests.py` on the following:
 - Arduino UNO R3 (ATmega328P, `arduino:avr:uno`)
 - D1 mini (ESP8266, `esp8266:esp8266:d1_mini` / `esp8266:esp8266:d1_mini_clone`)
   - Manually press the reset button immediately after the message "Waiting for boot..."
 - Arduino UNO R4 WiFi (`arduino:renesas_uno:unor4wifi`)
-  - Manually press the reset button on the message "Done in X seconds" and release on
-    "Waiting for boot..."
+  - Manually press the reset button immediately after the message "Waiting for boot..."
 
 References:
 - https://ascon.isec.tugraz.at/

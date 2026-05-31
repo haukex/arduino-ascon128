@@ -42,8 +42,14 @@ def main():
     args = parser.parse_args()
 
     # generate a ZIP archive from this repository
+    rv = run(['git', 'write-tree'], cwd=MY_PATH, check=True,
+             capture_output=True)
+    if rv.stderr:
+        raise RuntimeError(repr(rv.stderr))
+    tree_hash = rv.stdout.strip()
+    (MY_PATH/'Ascon128.zip').unlink()
     run(['git', 'archive', '--format', 'zip', '--prefix', 'Ascon128/',
-         '--output', 'Ascon128.zip', 'HEAD'], cwd=MY_PATH, check=True)
+         '--output', 'Ascon128.zip', tree_hash], cwd=MY_PATH, check=True)
     # get previous enable_unsafe_install value
     rv = run(['arduino-cli', 'config', 'get', 'library.enable_unsafe_install'],
              capture_output=True, check=True)
