@@ -22,6 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+import time
 import argparse
 from itertools import product
 from base64 import z85encode, z85decode
@@ -146,17 +147,22 @@ def do_decrypt_test(ser: serial.Serial):
         print(f"OK {t.decode('CP1252')!r} {enc.hex()}")
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('port', help="The serial port to use")
-    parser.add_argument('-W', '--no-wait', help="don't wait for boot message",
-                        action="store_true")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     with serial.Serial(port=args.port, baudrate=115200, timeout=5) as ser:
-        if not args.no_wait:
-            print("Waiting for boot...")
-            if not ser.read_until(b'Ready\r\n').endswith(b'Ready\r\n'):
-                raise RuntimeError('Failed to get "Ready" from Arduino')
+        print("Handshaking...")
+        start_time = time.monotonic()
+        while True:
+            ser.write(b'hDEADBEEF\n')
+            rx = ser.readline().rstrip(b'\r\n')
+            if rx == b'deadbeef':
+                break
+            print(repr(rx))
+            if time.monotonic() - start_time > 10:
+                raise TimeoutError()
+            time.sleep(1)
         do_hex_test(ser)
         do_z85_test(ser)
         do_encrypt_test(ser)

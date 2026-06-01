@@ -23,6 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 import argparse
+import importlib.util
 from pathlib import Path
 from time import monotonic
 from subprocess import run
@@ -34,12 +35,24 @@ import serial  # type: ignore[import-untyped]
 MY_PATH = Path(__file__).parent
 
 
-def main():
+def run_sub_test(port: str):
+    spec = importlib.util.spec_from_file_location(
+        'test', MY_PATH/'examples'/'Ascon128-Util-Tests'/'test.py')
+    if spec is None:
+        raise ModuleNotFoundError()
+    subtest = importlib.util.module_from_spec(spec)
+    if spec.loader is None:
+        raise RuntimeError()
+    spec.loader.exec_module(subtest)
+    subtest.main([port])
+
+
+def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('port', help="The serial port to use")
     parser.add_argument('FQBN', help="The board's FQBN"
                         " - Hint: `arduino-cli board listall`")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # generate a ZIP archive from this repository
     rv = run(['git', 'write-tree'], cwd=MY_PATH, check=True,
@@ -47,7 +60,7 @@ def main():
     if rv.stderr:
         raise RuntimeError(repr(rv.stderr))
     tree_hash = rv.stdout.strip()
-    (MY_PATH/'Ascon128.zip').unlink()
+    (MY_PATH/'Ascon128.zip').unlink(missing_ok=True)
     run(['git', 'archive', '--format', 'zip', '--prefix', 'Ascon128/',
          '--output', 'Ascon128.zip', tree_hash], cwd=MY_PATH, check=True)
     # get previous enable_unsafe_install value
@@ -71,24 +84,24 @@ def main():
          '--upload', '--port', args.port, '--verify',
          MY_PATH/'examples'/'Ascon128-Util-Tests'], check=True)
     # run my test script against the test sketch
-    run(['python', MY_PATH/'examples'/'Ascon128-Util-Tests'/'test.py',
-         args.port], check=True)
+    run_sub_test(args.port)
     # compile and upload the Ascon128 test sketch
     run(['arduino-cli', 'compile', '--fqbn', args.FQBN, '--warnings', 'all',
          '--upload', '--port', args.port, '--verify',
          MY_PATH/'examples'/'TestAscon'], check=True)
     # check the output of the Ascon128 test sketch
     with serial.Serial(port=args.port, baudrate=115200, timeout=10) as ser:
-        print("Waiting for boot...")
+        print("Waiting for tests to pass...")
         start_time = monotonic()
-        while True:
+        passed_count = 0
+        while passed_count < 5:  # we know TestAscon.ino runs 5 tests
             line = ser.readline().rstrip(b'\r\n\0')
             if line:
                 print(line.decode('ASCII', 'replace'))
-            if line == b'DONE':
-                break
             if b'fail' in line.lower():
                 raise RuntimeError(line)
+            if b'Passed' in line:
+                passed_count += 1
             if monotonic() - start_time > 30:
                 raise TimeoutError()
 

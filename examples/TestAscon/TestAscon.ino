@@ -379,7 +379,10 @@ void perfCipher(Ascon128 *cipher, const struct TestVector *test)
 void setup()
 {
     Serial.begin(115200);
+}
 
+void loop()
+{
     Serial.println();
 
     Serial.print("State Size ... ");
@@ -399,8 +402,4 @@ void setup()
     perfCipher(&acorn, &testVectorAscon128_4);
 
     Serial.println("DONE");
-}
-
-void loop()
-{
 }
